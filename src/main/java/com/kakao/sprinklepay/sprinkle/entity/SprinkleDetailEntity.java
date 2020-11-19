@@ -37,4 +37,13 @@ public class SprinkleDetailEntity {
 
     @Column(name = "receive_datetime")
     private LocalDateTime receiveDatetime;
+
+    private SprinkleDetailEntity(SprinkleEntity sprinkle, long amount) {
+        this.sprinkle = sprinkle;
+        this.amount = amount;
+    }
+
+    public static SprinkleDetailEntity create(SprinkleEntity sprinkle, long amount) {
+        return new SprinkleDetailEntity(sprinkle, amount);
+    }
 }
