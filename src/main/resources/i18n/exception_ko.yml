@@ -1,0 +1,6 @@
+serverError:
+  code: "-9999"
+  msg: "서버에서 오류가 발생했습니다. ({0})"
+distributeAmountError:
+  code: "-1000"
+  msg: "뿌리기 위한 페이가 사용자 수 보다 커야 합니다."

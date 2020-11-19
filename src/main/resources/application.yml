@@ -11,6 +11,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
     generate-ddl: true
+  messages:
+    basename: i18n/exception
+    encoding: UTF-8
 server:
   port: 8081
 
