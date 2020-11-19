@@ -1,5 +1,7 @@
 package com.kakao.sprinklepay.sprinkle.util;
 
+import com.kakao.sprinklepay.sprinkle.exception.DistributeAmountException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +15,7 @@ public class DistributeAmountUtil {
             return Collections.singletonList(amount);
         }
         if (targetCount > amount) {
-            throw new RuntimeException();
+            throw new DistributeAmountException();
         }
 
         List<Long> results = new ArrayList<>(targetCount);
