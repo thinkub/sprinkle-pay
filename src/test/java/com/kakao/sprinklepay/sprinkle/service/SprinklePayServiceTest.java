@@ -2,10 +2,7 @@ package com.kakao.sprinklepay.sprinkle.service;
 
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
-import com.kakao.sprinklepay.sprinkle.exception.AlreadyReceivedException;
-import com.kakao.sprinklepay.sprinkle.exception.NotSameRoomException;
-import com.kakao.sprinklepay.sprinkle.exception.ReceiveValidTimeException;
-import com.kakao.sprinklepay.sprinkle.exception.SprinkleUserNotReceiveException;
+import com.kakao.sprinklepay.sprinkle.exception.*;
 import com.kakao.sprinklepay.sprinkle.model.Receive;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
 import com.kakao.sprinklepay.sprinkle.repository.SprinkleRepository;
@@ -140,6 +137,35 @@ class SprinklePayServiceTest {
         assertThrows(AlreadyReceivedException.class, () -> service.receivePay(receive, receiveUserInfo));
     }
 
+    @Test
+    @DisplayName("뿌린 페이 받기 - 더이상 받을 페이가 없을때")
+    void 받기_받을페이가없는_Exception() {
+        // given
+        SprinkleEntity entity = SprinkleEntity.builder()
+                .sprinkleId(1L)
+                .roomId(ROOM_ID)
+                .token(TOKEN)
+                .targetCount(1)
+                .amount(1000)
+                .registerDatetime(LocalDateTime.now())
+                .userId(USER_ID)
+                .sprinkleDetails(new ArrayList<>(1))
+                .build();
+        SprinkleDetailEntity detailEntity = SprinkleDetailEntity.builder()
+                .sprinkle(entity)
+                .amount(1000)
+                .receiveUserId(RECEIVED_USER_ID)
+                .build();
+        List<SprinkleDetailEntity> detailEntities = Collections.singletonList(detailEntity);
+        entity.getSprinkleDetails().addAll(detailEntities);
+
+        when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
+        Receive receive = Receive.of(TOKEN);
+        UserInfo receiveUserInfo = UserInfo.of(3L, ROOM_ID);
+
+        // when
+        assertThrows(NoRemainPayReceivedException.class, () -> service.receivePay(receive, receiveUserInfo));
+    }
 
     private SprinkleEntity makeMockSprinkleEntity() {
         SprinkleEntity entity = SprinkleEntity.builder()
