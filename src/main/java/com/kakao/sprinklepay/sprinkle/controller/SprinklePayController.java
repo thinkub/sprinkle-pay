@@ -1,5 +1,6 @@
 package com.kakao.sprinklepay.sprinkle.controller;
 
+import com.kakao.sprinklepay.sprinkle.model.Receive;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
 import com.kakao.sprinklepay.sprinkle.service.SprinklePayService;
@@ -20,10 +21,19 @@ public class SprinklePayController {
     private final SprinklePayService sprinklePayService;
 
     @PostMapping
-    public ResponseEntity<?> sprinklePay(@RequestHeader(X_USER_ID) Long userId, @RequestHeader(X_ROOM_ID) String roomId,
-                                         @RequestBody Sprinkle request) {
+    public ResponseEntity<String> sprinklePay(@RequestHeader(X_USER_ID) Long userId, @RequestHeader(X_ROOM_ID) String roomId,
+                                              @RequestBody Sprinkle request) {
         UserInfo userInfo = UserInfo.of(userId, roomId);
         String token = sprinklePayService.sprinklePay(request, userInfo);
         return ResponseEntity.ok().body(token);
+    }
+
+    @PatchMapping("/{token}")
+    public ResponseEntity<Long> receivedPay(@RequestHeader(X_USER_ID) Long userId, @RequestHeader(X_ROOM_ID) String roomId,
+                                            @PathVariable String token) {
+        UserInfo userInfo = UserInfo.of(userId, roomId);
+        Receive receive = Receive.of(token);
+        long amount = sprinklePayService.receivePay(receive, userInfo);
+        return ResponseEntity.ok().body(amount);
     }
 }

@@ -2,6 +2,8 @@ package com.kakao.sprinklepay.sprinkle.service;
 
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
+import com.kakao.sprinklepay.sprinkle.exception.SprinklePayNotFoundException;
+import com.kakao.sprinklepay.sprinkle.model.Receive;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
 import com.kakao.sprinklepay.sprinkle.repository.SprinkleRepository;
@@ -36,5 +38,20 @@ public class SprinklePayService {
         sprinkleEntity.getSprinkleDetails().addAll(detailEntities);
 
         return token;
+    }
+
+    @Transactional
+    public long receivePay(Receive receive, UserInfo userInfo) {
+        SprinkleEntity sprinkleEntity =
+                sprinkleRepository.findByToken(receive.getToken()).orElseThrow(SprinklePayNotFoundException::new);
+        sprinkleEntity.validateReceive(userInfo);
+
+        SprinkleDetailEntity detailEntity = sprinkleEntity.getSprinkleDetails().stream()
+                .filter(SprinkleDetailEntity::hasValidReceive)
+                .findFirst()
+                .orElseThrow();
+
+        detailEntity.setReceiveUserInfo(userInfo.getUserId());
+        return detailEntity.getAmount();
     }
 }
