@@ -1,5 +1,6 @@
 package com.kakao.sprinklepay.sprinkle.util;
 
+import com.kakao.sprinklepay.sprinkle.exception.DistributeAmountException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +58,7 @@ class DistributeAmountUtilTest {
         int targetCount = 100;
 
         // when
-        assertThrows(RuntimeException.class, () -> DistributeAmountUtil.distributeAmount(amount, targetCount));
+        assertThrows(DistributeAmountException.class, () -> DistributeAmountUtil.distributeAmount(amount, targetCount));
     }
 
     @Test
