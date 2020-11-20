@@ -1,5 +1,6 @@
 package com.kakao.sprinklepay.sprinkle.entity;
 
+import com.kakao.sprinklepay.sprinkle.exception.*;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
 import lombok.Getter;
@@ -33,7 +34,7 @@ public class SprinkleEntity {
     @Column(name = "room_id", nullable = false, length = 20)
     private String roomId;
 
-    @Column(name = "token", nullable = false, length = 15)
+    @Column(name = "token", nullable = false, unique = true, length = 15)
     private String token;
 
     @Column(name = "target_count", nullable = false)
@@ -64,4 +65,23 @@ public class SprinkleEntity {
     public static SprinkleEntity create(UserInfo userInfo, Sprinkle sprinkle, String token) {
         return new SprinkleEntity(userInfo.getRoomId(), token, sprinkle.getTargetCount(), sprinkle.getAmount(), userInfo.getUserId());
     }
+
+    public void validateReceive(UserInfo userInfo) {
+        if (!userInfo.getRoomId().equals(this.roomId)) {
+            throw new NotSameRoomException();
+        }
+        if (userInfo.getUserId().equals(this.userId)) {
+            throw new SprinkleUserNotReceiveException();
+        }
+        if (this.registerDatetime.isBefore(LocalDateTime.now().minusMinutes(10L))) {
+            throw new ReceiveValidTimeException();
+        }
+        if (this.sprinkleDetails.stream().anyMatch(d -> d.hasReceived(userInfo.getUserId()))) {
+            throw new AlreadyReceivedException();
+        }
+        if (this.sprinkleDetails.stream().noneMatch(SprinkleDetailEntity::hasValidReceive)) {
+            throw new NoRemainPayReceivedException();
+        }
+    }
+
 }

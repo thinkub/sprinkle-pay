@@ -46,4 +46,17 @@ public class SprinkleDetailEntity {
     public static SprinkleDetailEntity create(SprinkleEntity sprinkle, long amount) {
         return new SprinkleDetailEntity(sprinkle, amount);
     }
+
+    public boolean hasReceived(Long userId) {
+        return userId.equals(this.receiveUserId);
+    }
+
+    public boolean hasValidReceive() {
+        return this.receiveUserId == null;
+    }
+
+    public void setReceiveUserInfo(Long userId) {
+        this.receiveUserId = userId;
+        this.receiveDatetime = LocalDateTime.now();
+    }
 }
