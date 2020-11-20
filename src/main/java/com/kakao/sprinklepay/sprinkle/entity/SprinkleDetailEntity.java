@@ -1,7 +1,6 @@
 package com.kakao.sprinklepay.sprinkle.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -13,12 +12,14 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "sprinkle_detail",
         indexes = {
                 @Index(columnList = "sprinkle_id")
         })
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SprinkleDetailEntity {
     @Id
     @Column(name = "sprinkle_detail_id")

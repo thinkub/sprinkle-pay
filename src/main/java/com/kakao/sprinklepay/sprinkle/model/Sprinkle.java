@@ -1,5 +1,6 @@
 package com.kakao.sprinklepay.sprinkle.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -8,6 +9,7 @@ import lombok.NonNull;
  */
 
 @Getter
+@Builder
 public class Sprinkle {
     @NonNull
     private long amount;

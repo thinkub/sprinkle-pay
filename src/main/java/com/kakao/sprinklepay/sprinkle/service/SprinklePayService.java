@@ -2,6 +2,7 @@ package com.kakao.sprinklepay.sprinkle.service;
 
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
+import com.kakao.sprinklepay.sprinkle.exception.NoRemainPayReceivedException;
 import com.kakao.sprinklepay.sprinkle.exception.SprinklePayNotFoundException;
 import com.kakao.sprinklepay.sprinkle.model.Receive;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
@@ -49,7 +50,7 @@ public class SprinklePayService {
         SprinkleDetailEntity detailEntity = sprinkleEntity.getSprinkleDetails().stream()
                 .filter(SprinkleDetailEntity::hasValidReceive)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(NoRemainPayReceivedException::new);
 
         detailEntity.setReceiveUserInfo(userInfo.getUserId());
         return detailEntity.getAmount();

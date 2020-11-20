@@ -3,8 +3,7 @@ package com.kakao.sprinklepay.sprinkle.entity;
 import com.kakao.sprinklepay.sprinkle.exception.*;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -19,11 +18,13 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "sprinkle",
         indexes = {
                 @Index(columnList = "room_id, token")
         })
 @EntityListeners(AuditingEntityListener.class)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class SprinkleEntity {
     @Id
