@@ -7,9 +7,10 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,10 +44,18 @@ public class Sprinkle {
     @Getter
     @Builder
     public static class Request {
-        @NonNull
         private long amount;
-        @NonNull
         private int targetCount;
+    }
+
+    @Getter
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Response {
+        private String token;
+
+        public static Response of(String token) {
+            return new Response(token);
+        }
     }
 
     @Getter

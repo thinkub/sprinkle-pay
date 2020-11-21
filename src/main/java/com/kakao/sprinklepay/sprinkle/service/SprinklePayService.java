@@ -27,7 +27,7 @@ public class SprinklePayService {
     private final SprinkleRepository sprinkleRepository;
 
     @Transactional
-    public String sprinklePay(Sprinkle.Request sprinkle, UserInfo userInfo) {
+    public Sprinkle.Response sprinklePay(Sprinkle.Request sprinkle, UserInfo userInfo) {
         String token = TokenProvider.getToken();
         SprinkleEntity sprinkleEntity = SprinkleEntity.create(userInfo, sprinkle, token);
         sprinkleRepository.save(sprinkleEntity);
@@ -38,7 +38,7 @@ public class SprinklePayService {
                 .collect(Collectors.toList());
         sprinkleEntity.getSprinkleDetails().addAll(detailEntities);
 
-        return token;
+        return Sprinkle.Response.of(token);
     }
 
     @Transactional
