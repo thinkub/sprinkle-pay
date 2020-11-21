@@ -42,7 +42,7 @@ public class SprinklePayService {
     }
 
     @Transactional
-    public long receivePay(Receive receive, UserInfo userInfo) {
+    public Receive.Response receivePay(Receive receive, UserInfo userInfo) {
         SprinkleEntity sprinkleEntity =
                 sprinkleRepository.findByToken(receive.getToken()).orElseThrow(SprinklePayNotFoundException::new);
         sprinkleEntity.validateReceive(userInfo);
@@ -53,7 +53,7 @@ public class SprinklePayService {
                 .orElseThrow(NoRemainPayReceivedException::new);
 
         detailEntity.setReceiveUserInfo(userInfo.getUserId());
-        return detailEntity.getAmount();
+        return Receive.Response.of(detailEntity.getAmount());
     }
 
     @Transactional(readOnly = true)

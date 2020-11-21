@@ -16,4 +16,14 @@ public class Receive {
     public static Receive of(String token) {
         return new Receive(token);
     }
+
+    @Getter
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Response {
+        private long receivedAmount;
+
+        public static Response of(long receivedAmount) {
+            return new Response(receivedAmount);
+        }
+    }
 }

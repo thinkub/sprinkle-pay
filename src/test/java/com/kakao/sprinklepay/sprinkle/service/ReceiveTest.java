@@ -50,10 +50,10 @@ class ReceiveTest {
         UserInfo receiveUserInfo = UserInfo.of(RECEIVED_USER_ID, ROOM_ID);
 
         // when
-        long amount = service.receivePay(receive, receiveUserInfo);
+        Receive.Response response = service.receivePay(receive, receiveUserInfo);
 
         // then
-        assertThat(amount).isEqualTo(1000);
+        assertThat(response.getReceivedAmount()).isEqualTo(1000);
     }
 
     @Test

@@ -21,20 +21,22 @@ public class SprinklePayController {
     private final SprinklePayService sprinklePayService;
 
     @PostMapping
-    public ResponseEntity<String> sprinklePay(@RequestHeader(X_USER_ID) Long userId, @RequestHeader(X_ROOM_ID) String roomId,
-                                              @RequestBody Sprinkle.Request request) {
+    public ResponseEntity<Sprinkle.Response> sprinklePay(@RequestHeader(X_USER_ID) Long userId,
+                                                         @RequestHeader(X_ROOM_ID) String roomId,
+                                                         @RequestBody Sprinkle.Request request) {
         UserInfo userInfo = UserInfo.of(userId, roomId);
-        String token = sprinklePayService.sprinklePay(request, userInfo);
-        return ResponseEntity.ok().body(token);
+        Sprinkle.Response response = sprinklePayService.sprinklePay(request, userInfo);
+        return ResponseEntity.ok().body(response);
     }
 
     @PatchMapping("/{token}")
-    public ResponseEntity<Long> receivedPay(@RequestHeader(X_USER_ID) Long userId, @RequestHeader(X_ROOM_ID) String roomId,
-                                            @PathVariable String token) {
+    public ResponseEntity<Receive.Response> receivedPay(@RequestHeader(X_USER_ID) Long userId,
+                                                        @RequestHeader(X_ROOM_ID) String roomId,
+                                                        @PathVariable String token) {
         UserInfo userInfo = UserInfo.of(userId, roomId);
         Receive receive = Receive.of(token);
-        long amount = sprinklePayService.receivePay(receive, userInfo);
-        return ResponseEntity.ok().body(amount);
+        Receive.Response response = sprinklePayService.receivePay(receive, userInfo);
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/{token}")

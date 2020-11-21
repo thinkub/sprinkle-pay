@@ -1,0 +1,71 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:site-url: /build/asciidoc/html5/
+
+= Kakaopay coding test API Reference
+
+== 카카오 페이 뿌리기
+
+=== 뿌리기 API
+
+curl)
+include::{snippets}/sprinklePay/curl-request.adoc[]
+
+==== path parameters
+
+==== request header
+
+include::{snippets}/sprinklePay/request-headers.adoc[]
+
+==== request body
+
+include::{snippets}/sprinklePay/request-body.adoc[]
+
+==== response body
+
+include::{snippets}/sprinklePay/response-fields.adoc[]
+
+=== 받기 API
+
+curl)
+include::{snippets}/sprinklePay-Receive/curl-request.adoc[]
+
+==== path parameters
+
+include::{snippets}/sprinklePay-Receive/path-parameters.adoc[]
+
+==== request header
+
+include::{snippets}/sprinklePay-Receive/request-headers.adoc[]
+
+==== request body
+
+==== response body
+
+include::{snippets}/sprinklePay-Receive/response-fields.adoc[]
+
+=== 조회 API
+
+curl)
+include::{snippets}/sprinklePay-Get/curl-request.adoc[]
+
+==== path parameters
+
+include::{snippets}/sprinklePay-Get/path-parameters.adoc[]
+
+==== request header
+
+include::{snippets}/sprinklePay-Get/request-headers.adoc[]
+
+==== request body
+
+==== response body
+
+include::{snippets}/sprinklePay-Get/response-fields.adoc[]
