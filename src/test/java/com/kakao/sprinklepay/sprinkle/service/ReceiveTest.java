@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
  */
 
 @ExtendWith(SpringExtension.class)
-class SprinklePayServiceTest {
+class ReceiveTest {
     private static final String ROOM_ID = "ROOM1";
     private static final Long USER_ID = 1L;
     private static final Long RECEIVED_USER_ID = 2L;
@@ -182,5 +182,4 @@ class SprinklePayServiceTest {
         entity.getSprinkleDetails().addAll(detailEntities);
         return entity;
     }
-
 }
