@@ -12,8 +12,8 @@ import com.kakao.sprinklepay.sprinkle.util.DistributeAmountUtil;
 import com.kakao.sprinklepay.sprinkle.util.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +27,7 @@ public class SprinklePayService {
     private final SprinkleRepository sprinkleRepository;
 
     @Transactional
-    public String sprinklePay(Sprinkle sprinkle, UserInfo userInfo) {
+    public String sprinklePay(Sprinkle.Request sprinkle, UserInfo userInfo) {
         String token = TokenProvider.getToken();
         SprinkleEntity sprinkleEntity = SprinkleEntity.create(userInfo, sprinkle, token);
         sprinkleRepository.save(sprinkleEntity);
@@ -54,5 +54,12 @@ public class SprinklePayService {
 
         detailEntity.setReceiveUserInfo(userInfo.getUserId());
         return detailEntity.getAmount();
+    }
+
+    @Transactional(readOnly = true)
+    public Sprinkle getSprinklePay(String token, UserInfo userInfo) {
+        SprinkleEntity entity = sprinkleRepository.findByToken(token).orElseThrow(SprinklePayNotFoundException::new);
+        entity.validateSearch(userInfo);
+        return Sprinkle.ofEntity(entity);
     }
 }

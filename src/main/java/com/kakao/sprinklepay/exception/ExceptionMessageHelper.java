@@ -65,8 +65,20 @@ public class ExceptionMessageHelper {
 
     Result sprinkleUserNotReceiveError() {
         String message = getMessage("sprinkleUserNotReceiveError.msg");
-        log.error(": {}", message);
+        log.error("SprinkleUserNotReceiveException: {}", message);
         return Result.of(getMessage("sprinkleUserNotReceiveError.code"), message);
+    }
+
+    Result sprinklePaySearchValidError() {
+        String message = getMessage("sprinklePaySearchValidDateError.msg");
+        log.error("SprinklePaySearchValidException: {}", message);
+        return Result.of(getMessage("sprinklePaySearchValidDateError.code"), message);
+    }
+
+    Result sprinklePayUserAccessDeniedError() {
+        String message = getMessage("sprinklePayUserAccessDenied.msg");
+        log.error("SprinklePayUserAccessDeniedException: {}", message);
+        return Result.of(getMessage("sprinklePayUserAccessDenied.code"), message);
     }
 
     private String getMessage(String code) {

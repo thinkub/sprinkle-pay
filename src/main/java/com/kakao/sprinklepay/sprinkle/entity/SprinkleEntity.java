@@ -63,8 +63,16 @@ public class SprinkleEntity {
         this.userId = userId;
     }
 
-    public static SprinkleEntity create(UserInfo userInfo, Sprinkle sprinkle, String token) {
+    public static SprinkleEntity create(UserInfo userInfo, Sprinkle.Request sprinkle, String token) {
         return new SprinkleEntity(userInfo.getRoomId(), token, sprinkle.getTargetCount(), sprinkle.getAmount(), userInfo.getUserId());
+    }
+
+    public long getRemainAmount() {
+        long receivedAmount = this.getSprinkleDetails().stream()
+                .filter(SprinkleDetailEntity::hasValidReceive)
+                .mapToLong(SprinkleDetailEntity::getAmount)
+                .sum();
+        return this.amount - receivedAmount;
     }
 
     public void validateReceive(UserInfo userInfo) {
@@ -74,7 +82,7 @@ public class SprinkleEntity {
         if (userInfo.getUserId().equals(this.userId)) {
             throw new SprinkleUserNotReceiveException();
         }
-        if (this.registerDatetime.isBefore(LocalDateTime.now().minusMinutes(10L))) {
+        if (this.registerDatetime.isBefore(LocalDateTime.now().minusMinutes(10))) {
             throw new ReceiveValidTimeException();
         }
         if (this.sprinkleDetails.stream().anyMatch(d -> d.hasReceived(userInfo.getUserId()))) {
@@ -85,4 +93,12 @@ public class SprinkleEntity {
         }
     }
 
+    public void validateSearch(UserInfo userInfo) {
+        if (!userInfo.getUserId().equals(this.userId)) {
+            throw new SprinklePayUserAccessDeniedException();
+        }
+        if (this.registerDatetime.isBefore(LocalDateTime.now().minusDays(7))) {
+            throw new SprinklePaySearchValidException();
+        }
+    }
 }

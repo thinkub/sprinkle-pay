@@ -55,4 +55,14 @@ public class ExceptionAdvisor {
     public ResponseEntity<ExceptionMessageHelper.Result> sprinkleUserNotReceiveException() {
         return new ResponseEntity<>(messageHelper.sprinkleUserNotReceiveError(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(SprinklePaySearchValidException.class)
+    public ResponseEntity<ExceptionMessageHelper.Result> sprinklePaySearchValidException() {
+        return new ResponseEntity<>(messageHelper.sprinklePaySearchValidError(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(SprinklePayUserAccessDeniedException.class)
+    public ResponseEntity<ExceptionMessageHelper.Result> sprinklePayUserAccessDeniedException() {
+        return new ResponseEntity<>(messageHelper.sprinklePayUserAccessDeniedError(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

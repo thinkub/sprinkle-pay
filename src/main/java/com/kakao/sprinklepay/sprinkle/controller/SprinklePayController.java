@@ -22,7 +22,7 @@ public class SprinklePayController {
 
     @PostMapping
     public ResponseEntity<String> sprinklePay(@RequestHeader(X_USER_ID) Long userId, @RequestHeader(X_ROOM_ID) String roomId,
-                                              @RequestBody Sprinkle request) {
+                                              @RequestBody Sprinkle.Request request) {
         UserInfo userInfo = UserInfo.of(userId, roomId);
         String token = sprinklePayService.sprinklePay(request, userInfo);
         return ResponseEntity.ok().body(token);
@@ -35,5 +35,14 @@ public class SprinklePayController {
         Receive receive = Receive.of(token);
         long amount = sprinklePayService.receivePay(receive, userInfo);
         return ResponseEntity.ok().body(amount);
+    }
+
+    @GetMapping("/{token}")
+    public ResponseEntity<Sprinkle> getSprinklePay(@RequestHeader(X_USER_ID) Long userId,
+                                                   @RequestHeader(X_ROOM_ID) String roomId,
+                                                   @PathVariable String token) {
+        UserInfo userInfo = UserInfo.of(userId, roomId);
+        Sprinkle sprinkle = sprinklePayService.getSprinklePay(token, userInfo);
+        return ResponseEntity.ok().body(sprinkle);
     }
 }
