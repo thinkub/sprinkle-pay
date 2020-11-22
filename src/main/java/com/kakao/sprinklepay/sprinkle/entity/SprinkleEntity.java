@@ -44,6 +44,12 @@ public class SprinkleEntity {
     @Column(name = "amount", nullable = false)
     private long amount;
 
+    @Column(name = "total_received_amount", nullable = false)
+    private long totalReceivedAmount;
+
+    @Column(name = "total_received_count", nullable = false)
+    private int totalReceivedCount;
+
     @CreatedDate
     @Column(name = "register_datetime", nullable = false)
     private LocalDateTime registerDatetime;
@@ -51,7 +57,7 @@ public class SprinkleEntity {
     @Column(name = "register_user_id", nullable = false)
     private Long userId;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "sprinkle_id")
     private List<SprinkleDetailEntity> sprinkleDetails = new ArrayList<>();
 
@@ -61,6 +67,8 @@ public class SprinkleEntity {
         this.targetCount = targetCount;
         this.amount = amount;
         this.userId = userId;
+        this.totalReceivedAmount = 0;
+        this.totalReceivedCount = 0;
     }
 
     public static SprinkleEntity create(UserInfo userInfo, Sprinkle.Request sprinkle, String token) {
@@ -68,11 +76,16 @@ public class SprinkleEntity {
     }
 
     public long getRemainAmount() {
-        long receivedAmount = this.getSprinkleDetails().stream()
-                .filter(SprinkleDetailEntity::hasValidReceive)
-                .mapToLong(SprinkleDetailEntity::getAmount)
-                .sum();
-        return this.amount - receivedAmount;
+//        long receivedAmount = this.getSprinkleDetails().stream()
+//                .filter(SprinkleDetailEntity::hasValidReceive)
+//                .mapToLong(SprinkleDetailEntity::getAmount)
+//                .sum();
+//        return this.amount - receivedAmount;
+        return this.amount - this.totalReceivedAmount;
+    }
+
+    public int getRemainCount() {
+        return this.targetCount - this.totalReceivedCount;
     }
 
     public void validateReceive(UserInfo userInfo) {
@@ -85,10 +98,7 @@ public class SprinkleEntity {
         if (this.registerDatetime.isBefore(LocalDateTime.now().minusMinutes(10))) {
             throw new ReceiveValidTimeException();
         }
-        if (this.sprinkleDetails.stream().anyMatch(d -> d.hasReceived(userInfo.getUserId()))) {
-            throw new AlreadyReceivedException();
-        }
-        if (this.sprinkleDetails.stream().noneMatch(SprinkleDetailEntity::hasValidReceive)) {
+        if (this.getRemainCount() == 0) {
             throw new NoRemainPayReceivedException();
         }
     }
@@ -100,5 +110,10 @@ public class SprinkleEntity {
         if (this.registerDatetime.isBefore(LocalDateTime.now().minusDays(7))) {
             throw new SprinklePaySearchValidException();
         }
+    }
+
+    public void received(long receivedAmount) {
+        this.totalReceivedAmount = this.totalReceivedAmount + receivedAmount;
+        this.totalReceivedCount++;
     }
 }

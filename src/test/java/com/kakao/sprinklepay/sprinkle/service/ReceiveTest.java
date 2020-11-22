@@ -5,6 +5,7 @@ import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
 import com.kakao.sprinklepay.sprinkle.exception.*;
 import com.kakao.sprinklepay.sprinkle.model.Receive;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
+import com.kakao.sprinklepay.sprinkle.repository.SprinkleDetailRepository;
 import com.kakao.sprinklepay.sprinkle.repository.SprinkleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,6 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +37,8 @@ class ReceiveTest {
     private SprinklePayService service;
     @Mock
     private SprinkleRepository sprinkleRepository;
+    @Mock
+    private SprinkleDetailRepository sprinkleDetailRepository;
 
     @Test
     @DisplayName("뿌린 페이 받기")
@@ -46,6 +46,7 @@ class ReceiveTest {
         // given
         SprinkleEntity entity = makeMockSprinkleEntity();
         when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
+        when(sprinkleDetailRepository.findBySprinkleAndReceiveUserId(any(), any())).thenReturn(Optional.empty());
         Receive receive = Receive.of(TOKEN);
         UserInfo receiveUserInfo = UserInfo.of(RECEIVED_USER_ID, ROOM_ID);
 
@@ -56,12 +57,14 @@ class ReceiveTest {
         assertThat(response.getReceivedAmount()).isEqualTo(1000);
     }
 
+
     @Test
     @DisplayName("뿌린 페이 받기 - 방 아이디가 다른경우")
     void 받기_다른방아이디_Exception() {
         // given
         SprinkleEntity entity = makeMockSprinkleEntity();
         when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
+        when(sprinkleDetailRepository.findBySprinkleAndReceiveUserId(any(), any())).thenReturn(Optional.empty());
         Receive receive = Receive.of("aaa-aaa-aaa");
         UserInfo receiveUserInfo = UserInfo.of(RECEIVED_USER_ID, "ROOM2");
 
@@ -75,6 +78,7 @@ class ReceiveTest {
         // given
         SprinkleEntity entity = makeMockSprinkleEntity();
         when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
+        when(sprinkleDetailRepository.findBySprinkleAndReceiveUserId(any(), any())).thenReturn(Optional.empty());
         Receive receive = Receive.of(TOKEN);
         UserInfo receiveUserInfo = UserInfo.of(USER_ID, ROOM_ID);
 
@@ -94,12 +98,10 @@ class ReceiveTest {
                 .amount(1000)
                 .registerDatetime(LocalDateTime.now().minusMinutes(10))
                 .userId(USER_ID)
-                .sprinkleDetails(new ArrayList<>(1))
                 .build();
-        List<SprinkleDetailEntity> detailEntities = Collections.singletonList(SprinkleDetailEntity.create(entity, 1000));
-        entity.getSprinkleDetails().addAll(detailEntities);
 
         when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
+        when(sprinkleDetailRepository.findBySprinkleAndReceiveUserId(any(), any())).thenReturn(Optional.empty());
         Receive receive = Receive.of(TOKEN);
         UserInfo receiveUserInfo = UserInfo.of(RECEIVED_USER_ID, ROOM_ID);
 
@@ -107,29 +109,20 @@ class ReceiveTest {
         assertThrows(ReceiveValidTimeException.class, () -> service.receivePay(receive, receiveUserInfo));
     }
 
+
     @Test
     @DisplayName("뿌린 페이 받기 - 이미 받은 사용자")
     void 받기_이미받은사용자_Exception() {
         // given
-        SprinkleEntity entity = SprinkleEntity.builder()
-                .sprinkleId(1L)
-                .roomId(ROOM_ID)
-                .token(TOKEN)
-                .targetCount(1)
-                .amount(1000)
-                .registerDatetime(LocalDateTime.now())
-                .userId(USER_ID)
-                .sprinkleDetails(new ArrayList<>(1))
-                .build();
+        SprinkleEntity entity = makeMockSprinkleEntity();
         SprinkleDetailEntity detailEntity = SprinkleDetailEntity.builder()
                 .sprinkle(entity)
                 .amount(1000)
                 .receiveUserId(RECEIVED_USER_ID)
                 .build();
-        List<SprinkleDetailEntity> detailEntities = Collections.singletonList(detailEntity);
-        entity.getSprinkleDetails().addAll(detailEntities);
 
         when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
+        when(sprinkleDetailRepository.findBySprinkleAndReceiveUserId(any(), any())).thenReturn(Optional.of(detailEntity));
         Receive receive = Receive.of(TOKEN);
         UserInfo receiveUserInfo = UserInfo.of(RECEIVED_USER_ID, ROOM_ID);
 
@@ -147,19 +140,14 @@ class ReceiveTest {
                 .token(TOKEN)
                 .targetCount(1)
                 .amount(1000)
+                .totalReceivedAmount(1000)
+                .totalReceivedCount(1)
                 .registerDatetime(LocalDateTime.now())
                 .userId(USER_ID)
-                .sprinkleDetails(new ArrayList<>(1))
                 .build();
-        SprinkleDetailEntity detailEntity = SprinkleDetailEntity.builder()
-                .sprinkle(entity)
-                .amount(1000)
-                .receiveUserId(RECEIVED_USER_ID)
-                .build();
-        List<SprinkleDetailEntity> detailEntities = Collections.singletonList(detailEntity);
-        entity.getSprinkleDetails().addAll(detailEntities);
 
         when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
+        when(sprinkleDetailRepository.findBySprinkleAndReceiveUserId(any(), any())).thenReturn(Optional.empty());
         Receive receive = Receive.of(TOKEN);
         UserInfo receiveUserInfo = UserInfo.of(3L, ROOM_ID);
 
@@ -168,7 +156,7 @@ class ReceiveTest {
     }
 
     private SprinkleEntity makeMockSprinkleEntity() {
-        SprinkleEntity entity = SprinkleEntity.builder()
+        return SprinkleEntity.builder()
                 .sprinkleId(1L)
                 .roomId(ROOM_ID)
                 .token(TOKEN)
@@ -176,10 +164,6 @@ class ReceiveTest {
                 .amount(1000)
                 .registerDatetime(LocalDateTime.now())
                 .userId(USER_ID)
-                .sprinkleDetails(new ArrayList<>(1))
                 .build();
-        List<SprinkleDetailEntity> detailEntities = Collections.singletonList(SprinkleDetailEntity.create(entity, 1000));
-        entity.getSprinkleDetails().addAll(detailEntities);
-        return entity;
     }
 }

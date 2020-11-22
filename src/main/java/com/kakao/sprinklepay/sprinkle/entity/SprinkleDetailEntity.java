@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @Table(name = "sprinkle_detail",
         indexes = {
-                @Index(columnList = "sprinkle_id")
+                @Index(columnList = "sprinkle_id, receive_user_id"),
         })
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
@@ -39,13 +39,14 @@ public class SprinkleDetailEntity {
     @Column(name = "receive_datetime")
     private LocalDateTime receiveDatetime;
 
-    private SprinkleDetailEntity(SprinkleEntity sprinkle, long amount) {
+    private SprinkleDetailEntity(SprinkleEntity sprinkle, Long receiveUserId, long amount) {
         this.sprinkle = sprinkle;
+        this.receiveUserId = receiveUserId;
         this.amount = amount;
     }
 
-    public static SprinkleDetailEntity create(SprinkleEntity sprinkle, long amount) {
-        return new SprinkleDetailEntity(sprinkle, amount);
+    public static SprinkleDetailEntity create(SprinkleEntity sprinkle, Long receiveUserId, long amount) {
+        return new SprinkleDetailEntity(sprinkle, receiveUserId, amount);
     }
 
     public boolean hasReceived(Long userId) {
