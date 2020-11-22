@@ -11,6 +11,6 @@ import java.util.Optional;
  * @author by Ming(thinkub0219@gmail.com) on 2020/11/17.
  */
 public interface SprinkleRepository extends JpaRepository<SprinkleEntity, Long> {
-    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<SprinkleEntity> findByToken(String token);
 }
