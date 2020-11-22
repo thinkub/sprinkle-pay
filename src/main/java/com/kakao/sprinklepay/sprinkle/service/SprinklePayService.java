@@ -1,12 +1,13 @@
 package com.kakao.sprinklepay.sprinkle.service;
 
+import com.kakao.sprinklepay.sprinkle.component.SprinkleRedisHelper;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
-import com.kakao.sprinklepay.sprinkle.exception.NoRemainPayReceivedException;
 import com.kakao.sprinklepay.sprinkle.exception.SprinklePayNotFoundException;
 import com.kakao.sprinklepay.sprinkle.model.Receive;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
+import com.kakao.sprinklepay.sprinkle.repository.SprinkleDetailRepository;
 import com.kakao.sprinklepay.sprinkle.repository.SprinkleRepository;
 import com.kakao.sprinklepay.sprinkle.util.DistributeAmountUtil;
 import com.kakao.sprinklepay.sprinkle.util.TokenProvider;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SprinklePayService {
     private final SprinkleRepository sprinkleRepository;
+    private final SprinkleDetailRepository sprinkleDetailRepository;
+    private final SprinkleRedisHelper sprinkleRedisHelper;
 
     @Transactional
     public Sprinkle.Response sprinklePay(Sprinkle.Request sprinkle, UserInfo userInfo) {
@@ -36,8 +39,8 @@ public class SprinklePayService {
         List<SprinkleDetailEntity> detailEntities = distributeAmount.stream()
                 .map(d -> SprinkleDetailEntity.create(sprinkleEntity, d))
                 .collect(Collectors.toList());
-        sprinkleEntity.getSprinkleDetails().addAll(detailEntities);
-
+        sprinkleDetailRepository.saveAll(detailEntities);
+        sprinkleRedisHelper.saveSprinkle(detailEntities, token);
         return Sprinkle.Response.of(token);
     }
 
@@ -47,12 +50,10 @@ public class SprinklePayService {
                 sprinkleRepository.findByToken(receive.getToken()).orElseThrow(SprinklePayNotFoundException::new);
         sprinkleEntity.validateReceive(userInfo);
 
-        SprinkleDetailEntity detailEntity = sprinkleEntity.getSprinkleDetails().stream()
-                .filter(SprinkleDetailEntity::hasValidReceive)
-                .findFirst()
-                .orElseThrow(NoRemainPayReceivedException::new);
-
+        Long sprinkleDetailId = sprinkleRedisHelper.getValidSprinkleDetail(sprinkleEntity.getToken());
+        SprinkleDetailEntity detailEntity = sprinkleDetailRepository.findById(sprinkleDetailId).orElseThrow(SprinklePayNotFoundException::new);
         detailEntity.setReceiveUserInfo(userInfo.getUserId());
+
         return Receive.Response.of(detailEntity.getAmount());
     }
 

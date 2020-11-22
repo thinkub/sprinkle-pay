@@ -51,7 +51,7 @@ public class SprinkleEntity {
     @Column(name = "register_user_id", nullable = false)
     private Long userId;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "sprinkle_id")
     private List<SprinkleDetailEntity> sprinkleDetails = new ArrayList<>();
 
