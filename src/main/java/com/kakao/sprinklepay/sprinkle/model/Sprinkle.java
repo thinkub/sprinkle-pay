@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
+import com.kakao.sprinklepay.sprinkle.exception.DistributeAmountException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +47,12 @@ public class Sprinkle {
     public static class Request {
         private long amount;
         private int targetCount;
+
+        public void validRequest() {
+            if (amount < targetCount) {
+                throw new DistributeAmountException();
+            }
+        }
     }
 
     @Getter

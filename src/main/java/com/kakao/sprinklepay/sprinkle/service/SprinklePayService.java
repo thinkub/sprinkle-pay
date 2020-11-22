@@ -29,6 +29,7 @@ public class SprinklePayService {
 
     @Transactional
     public Sprinkle.Response sprinklePay(Sprinkle.Request sprinkle, UserInfo userInfo) {
+        sprinkle.validRequest();
         String token = TokenProvider.getToken();
         SprinkleEntity sprinkleEntity = SprinkleEntity.create(userInfo, sprinkle, token);
         sprinkleRepository.save(sprinkleEntity);
