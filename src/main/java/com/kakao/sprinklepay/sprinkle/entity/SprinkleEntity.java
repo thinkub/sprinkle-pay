@@ -76,11 +76,6 @@ public class SprinkleEntity {
     }
 
     public long getRemainAmount() {
-//        long receivedAmount = this.getSprinkleDetails().stream()
-//                .filter(SprinkleDetailEntity::hasValidReceive)
-//                .mapToLong(SprinkleDetailEntity::getAmount)
-//                .sum();
-//        return this.amount - receivedAmount;
         return this.amount - this.totalReceivedAmount;
     }
 
