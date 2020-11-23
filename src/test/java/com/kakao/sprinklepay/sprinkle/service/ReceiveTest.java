@@ -1,8 +1,9 @@
 package com.kakao.sprinklepay.sprinkle.service;
 
+import com.kakao.sprinklepay.exception.ExceptionType;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
-import com.kakao.sprinklepay.sprinkle.exception.*;
+import com.kakao.sprinklepay.sprinkle.exception.CustomException;
 import com.kakao.sprinklepay.sprinkle.model.Receive;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
 import com.kakao.sprinklepay.sprinkle.repository.SprinkleDetailRepository;
@@ -73,7 +74,8 @@ class ReceiveTest {
         UserInfo receiveUserInfo = UserInfo.of(RECEIVED_USER_ID, "ROOM2");
 
         // when
-        assertThrows(NotSameRoomException.class, () -> service.receivePay(receive, receiveUserInfo));
+        Throwable customException = assertThrows(CustomException.class, () -> service.receivePay(receive, receiveUserInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.NOT_SAME_ROOM_ERROR.name());
     }
 
     @Test
@@ -87,7 +89,8 @@ class ReceiveTest {
         UserInfo receiveUserInfo = UserInfo.of(USER_ID, ROOM_ID);
 
         // when
-        assertThrows(SprinkleUserNotReceiveException.class, () -> service.receivePay(receive, receiveUserInfo));
+        Throwable customException = assertThrows(CustomException.class, () -> service.receivePay(receive, receiveUserInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.SPRINKLE_USER_NOT_RECEIVE_ERROR.name());
     }
 
     @Test
@@ -110,7 +113,8 @@ class ReceiveTest {
         UserInfo receiveUserInfo = UserInfo.of(RECEIVED_USER_ID, ROOM_ID);
 
         // when
-        assertThrows(ReceiveValidTimeException.class, () -> service.receivePay(receive, receiveUserInfo));
+        Throwable customException = assertThrows(CustomException.class, () -> service.receivePay(receive, receiveUserInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.RECEIVE_VALID_TIME_ERROR.name());
     }
 
 
@@ -131,7 +135,8 @@ class ReceiveTest {
         UserInfo receiveUserInfo = UserInfo.of(RECEIVED_USER_ID, ROOM_ID);
 
         // when
-        assertThrows(AlreadyReceivedException.class, () -> service.receivePay(receive, receiveUserInfo));
+        Throwable customException = assertThrows(CustomException.class, () -> service.receivePay(receive, receiveUserInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.ALREADY_RECEIVED_ERROR.name());
     }
 
     @Test
@@ -156,7 +161,8 @@ class ReceiveTest {
         UserInfo receiveUserInfo = UserInfo.of(3L, ROOM_ID);
 
         // when
-        assertThrows(NoRemainPayReceivedException.class, () -> service.receivePay(receive, receiveUserInfo));
+        Throwable customException = assertThrows(CustomException.class, () -> service.receivePay(receive, receiveUserInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.NO_REMAIN_PAY_RECEIVE_ERROR.name());
     }
 
     @Test

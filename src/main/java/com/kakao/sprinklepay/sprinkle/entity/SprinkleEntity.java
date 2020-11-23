@@ -1,6 +1,7 @@
 package com.kakao.sprinklepay.sprinkle.entity;
 
-import com.kakao.sprinklepay.sprinkle.exception.*;
+import com.kakao.sprinklepay.exception.ExceptionType;
+import com.kakao.sprinklepay.sprinkle.exception.CustomException;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
 import lombok.*;
@@ -59,6 +60,7 @@ public class SprinkleEntity {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "sprinkle_id")
+    @Builder.Default
     private List<SprinkleDetailEntity> sprinkleDetails = new ArrayList<>();
 
     private SprinkleEntity(String roomId, String token, int targetCount, long amount, Long userId) {
@@ -85,25 +87,25 @@ public class SprinkleEntity {
 
     public void validateReceive(UserInfo userInfo) {
         if (!userInfo.getRoomId().equals(this.roomId)) {
-            throw new NotSameRoomException();
+            throw new CustomException(ExceptionType.NOT_SAME_ROOM_ERROR);
         }
         if (userInfo.getUserId().equals(this.userId)) {
-            throw new SprinkleUserNotReceiveException();
+            throw new CustomException(ExceptionType.SPRINKLE_USER_NOT_RECEIVE_ERROR);
         }
         if (this.registerDatetime.isBefore(LocalDateTime.now().minusMinutes(10))) {
-            throw new ReceiveValidTimeException();
+            throw new CustomException(ExceptionType.RECEIVE_VALID_TIME_ERROR);
         }
         if (this.getRemainCount() == 0) {
-            throw new NoRemainPayReceivedException();
+            throw new CustomException(ExceptionType.NO_REMAIN_PAY_RECEIVE_ERROR);
         }
     }
 
     public void validateSearch(UserInfo userInfo) {
         if (!userInfo.getUserId().equals(this.userId)) {
-            throw new SprinklePayUserAccessDeniedException();
+            throw new CustomException(ExceptionType.SPRINKLE_PAY_USER_ACCESS_DENIED);
         }
         if (this.registerDatetime.isBefore(LocalDateTime.now().minusDays(7))) {
-            throw new SprinklePaySearchValidException();
+            throw new CustomException(ExceptionType.SPRINKLE_PAY_SEARCH_VALID_DATE_ERROR);
         }
     }
 

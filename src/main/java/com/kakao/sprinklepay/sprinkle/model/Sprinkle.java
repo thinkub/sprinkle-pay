@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.kakao.sprinklepay.exception.ExceptionType;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
-import com.kakao.sprinklepay.sprinkle.exception.DistributeAmountException;
+import com.kakao.sprinklepay.sprinkle.exception.CustomException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +38,7 @@ public class Sprinkle {
         return Sprinkle.builder()
                 .sprinkleDatetime(entity.getRegisterDatetime())
                 .sprinkleAmount(entity.getAmount())
-                .receivedAmount(entity.getRemainAmount())
+                .receivedAmount(entity.getTotalReceivedAmount())
                 .details(entity.getSprinkleDetails().stream().map(Detail::ofEntity).collect(toList()))
                 .build();
     }
@@ -50,7 +51,7 @@ public class Sprinkle {
 
         public void validRequest() {
             if (amount < targetCount) {
-                throw new DistributeAmountException();
+                throw new CustomException(ExceptionType.DISTRIBUTE_AMOUNT_ERROR);
             }
         }
     }

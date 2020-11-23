@@ -10,7 +10,7 @@ alreadyReceivedError:
 noRemainPayReceiveError:
   code: "-1002"
   msg: "받을수 있는 페이가 남아있지 않습니다."
-notSameRoomExceptionError:
+notSameRoomError:
   code: "-1003"
   msg: "해당 방에서 받을 수 있는 뿌리기 정보가 아닙니다."
 receiveValidTimeError:

@@ -1,6 +1,7 @@
 package com.kakao.sprinklepay.sprinkle.service;
 
-import com.kakao.sprinklepay.sprinkle.exception.DistributeAmountException;
+import com.kakao.sprinklepay.exception.ExceptionType;
+import com.kakao.sprinklepay.sprinkle.exception.CustomException;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
 import com.kakao.sprinklepay.sprinkle.repository.SprinkleRepository;
@@ -51,6 +52,7 @@ class SprinklePayTest {
         UserInfo userInfo = UserInfo.of(USER_ID, ROOM_ID);
 
         // when
-        assertThrows(DistributeAmountException.class, () -> service.sprinklePay(request, userInfo));
+        Throwable customException = assertThrows(CustomException.class, () -> service.sprinklePay(request, userInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.DISTRIBUTE_AMOUNT_ERROR.name());
     }
 }

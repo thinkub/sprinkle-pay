@@ -1,9 +1,9 @@
 package com.kakao.sprinklepay.sprinkle.service;
 
+import com.kakao.sprinklepay.exception.ExceptionType;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
-import com.kakao.sprinklepay.sprinkle.exception.SprinklePaySearchValidException;
-import com.kakao.sprinklepay.sprinkle.exception.SprinklePayUserAccessDeniedException;
+import com.kakao.sprinklepay.sprinkle.exception.CustomException;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
 import com.kakao.sprinklepay.sprinkle.repository.SprinkleRepository;
@@ -68,7 +68,8 @@ class SprinklePaySearchTest {
         UserInfo userInfo = UserInfo.of(2L, ROOM_ID);
 
         // when
-        assertThrows(SprinklePayUserAccessDeniedException.class, () -> service.getSprinklePay(TOKEN, userInfo));
+        Throwable customException = assertThrows(CustomException.class, () -> service.getSprinklePay(TOKEN, userInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.SPRINKLE_PAY_USER_ACCESS_DENIED.name());
     }
 
     @Test
@@ -80,7 +81,21 @@ class SprinklePaySearchTest {
         UserInfo userInfo = UserInfo.of(USER_ID, ROOM_ID);
 
         // when
-        assertThrows(SprinklePaySearchValidException.class, () -> service.getSprinklePay(TOKEN, userInfo));
+        Throwable customException = assertThrows(CustomException.class, () -> service.getSprinklePay(TOKEN, userInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.SPRINKLE_PAY_SEARCH_VALID_DATE_ERROR.name());
+    }
+
+    @Test
+    @DisplayName("뿌리기 조회 - token 정보가 잘못된 경우")
+    void 뿌리기조회_TOKEN정보오류_Exception() {
+        // given
+        SprinkleEntity entity = makeMockSprinkleEntity(LocalDateTime.now());
+        when(sprinkleRepository.findByToken(any())).thenReturn(Optional.ofNullable(null));
+        UserInfo userInfo = UserInfo.of(USER_ID, ROOM_ID);
+
+        // when
+        Throwable customException = assertThrows(CustomException.class, () -> service.getSprinklePay(TOKEN, userInfo));
+        assertThat(customException.getMessage()).isEqualTo(ExceptionType.SPRINKLE_PAY_NOT_FOUND_ERROR.name());
     }
 
     private SprinkleEntity makeMockSprinkleEntity(LocalDateTime registerDatetime) {

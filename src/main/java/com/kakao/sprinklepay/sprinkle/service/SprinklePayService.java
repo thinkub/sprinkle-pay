@@ -1,9 +1,9 @@
 package com.kakao.sprinklepay.sprinkle.service;
 
+import com.kakao.sprinklepay.exception.ExceptionType;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleDetailEntity;
 import com.kakao.sprinklepay.sprinkle.entity.SprinkleEntity;
-import com.kakao.sprinklepay.sprinkle.exception.AlreadyReceivedException;
-import com.kakao.sprinklepay.sprinkle.exception.SprinklePayNotFoundException;
+import com.kakao.sprinklepay.sprinkle.exception.CustomException;
 import com.kakao.sprinklepay.sprinkle.model.Receive;
 import com.kakao.sprinklepay.sprinkle.model.Sprinkle;
 import com.kakao.sprinklepay.sprinkle.model.UserInfo;
@@ -39,13 +39,13 @@ public class SprinklePayService {
     @Transactional
     public Receive.Response receivePay(Receive receive, UserInfo userInfo) {
         SprinkleEntity sprinkleEntity =
-                sprinkleRepository.findByToken(receive.getToken()).orElseThrow(SprinklePayNotFoundException::new);
+                sprinkleRepository.findByToken(receive.getToken()).orElseThrow(() -> new CustomException(ExceptionType.SPRINKLE_PAY_NOT_FOUND_ERROR));
         sprinkleEntity.validateReceive(userInfo);
 
         Optional<SprinkleDetailEntity> detailOptional =
                 sprinkleDetailRepository.findBySprinkleAndReceiveUserId(sprinkleEntity, userInfo.getUserId());
         if (detailOptional.isPresent()) {
-            throw new AlreadyReceivedException();
+            throw new CustomException(ExceptionType.ALREADY_RECEIVED_ERROR);
         }
 
         long distributeAmount =
@@ -59,7 +59,7 @@ public class SprinklePayService {
 
     @Transactional(readOnly = true)
     public Sprinkle getSprinklePay(String token, UserInfo userInfo) {
-        SprinkleEntity entity = sprinkleRepository.findByToken(token).orElseThrow(SprinklePayNotFoundException::new);
+        SprinkleEntity entity = sprinkleRepository.findByToken(token).orElseThrow(() -> new CustomException(ExceptionType.SPRINKLE_PAY_NOT_FOUND_ERROR));
         entity.validateSearch(userInfo);
         return Sprinkle.ofEntity(entity);
     }

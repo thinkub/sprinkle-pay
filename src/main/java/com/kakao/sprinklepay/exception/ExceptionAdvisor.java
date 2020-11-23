@@ -1,6 +1,6 @@
 package com.kakao.sprinklepay.exception;
 
-import com.kakao.sprinklepay.sprinkle.exception.*;
+import com.kakao.sprinklepay.sprinkle.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,48 +21,8 @@ public class ExceptionAdvisor {
         return new ResponseEntity<>(messageHelper.serverError(e), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(DistributeAmountException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> distributeAmountException() {
-        return new ResponseEntity<>(messageHelper.distributeAmountError(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(AlreadyReceivedException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> alreadyReceivedException() {
-        return new ResponseEntity<>(messageHelper.alreadyReceivedError(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(NoRemainPayReceivedException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> noRemainPayReceivedException() {
-        return new ResponseEntity<>(messageHelper.noRemainPayReceiveError(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(NotSameRoomException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> notSameRoomException() {
-        return new ResponseEntity<>(messageHelper.notSameRoomExceptionError(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(ReceiveValidTimeException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> receiveValidTimeException() {
-        return new ResponseEntity<>(messageHelper.receiveValidTimeError(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(SprinklePayNotFoundException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> sprinklePayNotFoundException() {
-        return new ResponseEntity<>(messageHelper.sprinklePayNotFoundError(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(SprinkleUserNotReceiveException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> sprinkleUserNotReceiveException() {
-        return new ResponseEntity<>(messageHelper.sprinkleUserNotReceiveError(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(SprinklePaySearchValidException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> sprinklePaySearchValidException() {
-        return new ResponseEntity<>(messageHelper.sprinklePaySearchValidError(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(SprinklePayUserAccessDeniedException.class)
-    public ResponseEntity<ExceptionMessageHelper.Result> sprinklePayUserAccessDeniedException() {
-        return new ResponseEntity<>(messageHelper.sprinklePayUserAccessDeniedError(), HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ExceptionMessageHelper.Result> customException(CustomException e) {
+        return new ResponseEntity<>(messageHelper.getExceptionMessage(e.getCode()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
