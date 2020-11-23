@@ -1,5 +1,8 @@
 # 페이 뿌리기 API
 
+## Github
+https://github.com/thinkub/sprinkle-pay
+
 ## Feature
 * Java 11
 * Sprint boot 2.4.0
