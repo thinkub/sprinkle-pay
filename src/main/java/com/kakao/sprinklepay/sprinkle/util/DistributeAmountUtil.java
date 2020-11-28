@@ -15,7 +15,7 @@ public class DistributeAmountUtil {
         if (remainAmount == 0) {
             return 1;
         }
-        long randomAmount = (long) (Math.random() * remainAmount + 1);
+        long randomAmount = (long) (Math.random() * (remainAmount / remainCount) + 1);
         return randomAmount + 1L;
     }
 }
