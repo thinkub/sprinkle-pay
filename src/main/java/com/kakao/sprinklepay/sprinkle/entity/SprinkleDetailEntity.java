@@ -1,6 +1,7 @@
 package com.kakao.sprinklepay.sprinkle.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -36,6 +37,7 @@ public class SprinkleDetailEntity {
     @Column(name = "receive_user_id")
     private Long receiveUserId;
 
+    @CreatedDate
     @Column(name = "receive_datetime")
     private LocalDateTime receiveDatetime;
 
