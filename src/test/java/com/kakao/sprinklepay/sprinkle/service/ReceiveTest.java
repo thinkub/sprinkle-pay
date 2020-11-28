@@ -165,6 +165,28 @@ class ReceiveTest {
         assertThat(customException.getMessage()).isEqualTo(ExceptionType.NO_REMAIN_PAY_RECEIVE_ERROR.name());
     }
 
+    /**
+     * 이 TestCase는 정상 동작이 될 경우도 있지만 근본적으로 로직에 대한 정상 테스트가 불가능
+     * 그 이유는 받기기능 동작 시 동시에 많은 사용자가 받기(thread) 호출 시 thread safe하도록 DB에 비관적락 (select for update) 을 걸었으나
+     * TestCase 자체가 DB의 Dependency를 가지지 않도록 Mock을 사용 하였기 때문에 비관적 락에 대한 기능이 동작 하지 않음.
+     * <p>
+     * 대신, 여러 사용자에 대한 test 진행은 bash shell에 curl을 이용하여 검증 완료
+     * <p>
+     * ex) 100 명의 사용자가 받기 api를 호출하는 경우에 대한 shell
+     * <p>
+     * #!/bin/bash
+     * <p>
+     * if [ $# -ne 1 ]; then
+     * echo "Token 값 입력 필수"
+     * exit -1
+     * fi
+     * <p>
+     * SET=$(seq 2 101)
+     * for i in $SET
+     * do
+     * curl 'http://localhost:8081/sprinkle/'$1 -i -X PATCH -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/json' -H 'X-USER-ID: '$i -H 'X-ROOM-ID: ROOM1' &
+     * done
+     */
     @Test
     @DisplayName("뿌린 페이 받기 - 동시에 여러 사용자가 받는 경우")
     void 받기_동시_여러사용자() {
