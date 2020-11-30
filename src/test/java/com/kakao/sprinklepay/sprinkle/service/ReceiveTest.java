@@ -16,13 +16,9 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.LongStream;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -187,38 +183,37 @@ class ReceiveTest {
      * curl 'http://localhost:8081/sprinkle/'$1 -i -X PATCH -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/json' -H 'X-USER-ID: '$i -H 'X-ROOM-ID: ROOM1' &
      * done
      */
-    @Test
-    @DisplayName("뿌린 페이 받기 - 동시에 여러 사용자가 받는 경우")
-    void 받기_동시_여러사용자() {
-        // given
-        SprinkleEntity entity = SprinkleEntity.builder()
-                .sprinkleId(1L)
-                .roomId(ROOM_ID)
-                .token(TOKEN)
-                .targetCount(100)
-                .amount(10000)
-                .registerDatetime(LocalDateTime.now())
-                .userId(USER_ID)
-                .build();
-        when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
-        when(sprinkleDetailRepository.findBySprinkleAndReceiveUserId(any(), any())).thenReturn(Optional.empty());
-        Receive receive = Receive.of(TOKEN);
-        List<Long> receiveUserIds = LongStream.rangeClosed(2, 101).boxed().collect(toList());
-
-        // when
-        List<Receive.Response> responses = receiveUserIds.parallelStream().map(u -> {
-            UserInfo receiveUserInfo = UserInfo.of(u, ROOM_ID);
-            return service.receivePay(receive, receiveUserInfo);
-        }).collect(toList());
-
-        // then
-        assertAll(
-                () -> assertThat(responses.size()).isEqualTo(100),
-                () -> assertThat(responses.stream().mapToLong(Receive.Response::getReceivedAmount).sum()).isEqualTo(10000)
-        );
-
-    }
-
+//    @Test
+//    @DisplayName("뿌린 페이 받기 - 동시에 여러 사용자가 받는 경우")
+//    void 받기_동시_여러사용자() {
+//        // given
+//        SprinkleEntity entity = SprinkleEntity.builder()
+//                .sprinkleId(1L)
+//                .roomId(ROOM_ID)
+//                .token(TOKEN)
+//                .targetCount(100)
+//                .amount(10000)
+//                .registerDatetime(LocalDateTime.now())
+//                .userId(USER_ID)
+//                .build();
+//        when(sprinkleRepository.findByToken(any())).thenReturn(Optional.of(entity));
+//        when(sprinkleDetailRepository.findBySprinkleAndReceiveUserId(any(), any())).thenReturn(Optional.empty());
+//        Receive receive = Receive.of(TOKEN);
+//        List<Long> receiveUserIds = LongStream.rangeClosed(2, 101).boxed().collect(toList());
+//
+//        // when
+//        List<Receive.Response> responses = receiveUserIds.parallelStream().map(u -> {
+//            UserInfo receiveUserInfo = UserInfo.of(u, ROOM_ID);
+//            return service.receivePay(receive, receiveUserInfo);
+//        }).collect(toList());
+//
+//        // then
+//        assertAll(
+//                () -> assertThat(responses.size()).isEqualTo(100),
+//                () -> assertThat(responses.stream().mapToLong(Receive.Response::getReceivedAmount).sum()).isEqualTo(10000)
+//        );
+//
+//    }
     private SprinkleEntity makeMockSprinkleEntity() {
         return SprinkleEntity.builder()
                 .sprinkleId(1L)

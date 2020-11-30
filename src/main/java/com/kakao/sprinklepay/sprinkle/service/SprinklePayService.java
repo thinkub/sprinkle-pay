@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * @author by Ming(thinkub0219@gmail.com) on 2020/11/17.
@@ -42,9 +42,14 @@ public class SprinklePayService {
                 sprinkleRepository.findByToken(receive.getToken()).orElseThrow(() -> new CustomException(ExceptionType.SPRINKLE_PAY_NOT_FOUND_ERROR));
         sprinkleEntity.validateReceive(userInfo);
 
-        Optional<SprinkleDetailEntity> detailOptional =
-                sprinkleDetailRepository.findBySprinkleAndReceiveUserId(sprinkleEntity, userInfo.getUserId());
-        if (detailOptional.isPresent()) {
+//        Optional<SprinkleDetailEntity> detailOptional =
+//                sprinkleDetailRepository.findBySprinkleAndReceiveUserId(sprinkleEntity, userInfo.getUserId());
+//        if (detailOptional.isPresent()) {
+//            throw new CustomException(ExceptionType.ALREADY_RECEIVED_ERROR);
+//        }
+
+        List<SprinkleDetailEntity> sprinkleDetailEntities = sprinkleEntity.getSprinkleDetails();
+        if (sprinkleDetailEntities.stream().anyMatch(d -> userInfo.getUserId().equals(d.getReceiveUserId()))) {
             throw new CustomException(ExceptionType.ALREADY_RECEIVED_ERROR);
         }
 
